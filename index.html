@@ -213,6 +213,7 @@ async def fetch_data(event):
         except Exception as err:
             print(err)
             t = 75
+            MATCHINFO = 0
 
         if type(MATCHINFO) == list:
             if len(MATCHINFO) == 6:
