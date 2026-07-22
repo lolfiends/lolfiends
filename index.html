@@ -132,6 +132,7 @@ async def fetch_data(event):
     API_KEY = ""
     
     response = await pyfetch("https://lolfiends.pythonanywhere.com/api/data")
+    print(response)
     API_KEY = await response.json()
     API_KEY = API_KEY["message"]
     print(API_KEY)
