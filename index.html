@@ -130,6 +130,13 @@ async def fetch_data(event):
     status_el.innerText = "Status: Sending API-Request..."
     output_el.innerText = "Loading..."
     API_KEY = ""
+    async def load_key():
+        response = await pyfetch("https://lolfiends.pythonanywhere.com/api/data")
+        API_KEY = await response.json()
+
+
+
+        
     try:
         response = await pyfetch("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/"+url+"?api_key="+API_KEY)
         if response.ok:
