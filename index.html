@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LolFiends</title>
+    <!-- PyScript CSS & JS über CDN (keine lokale Python-Installation nötig) -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 2rem; background-color: #f1f5f9; color: #0f172a;
+        }
+        .card {
+            max-width: 800px; margin: 0 auto; background: #ffffff;
+            border-radius: 12px; padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        h1 { margin-top: 0; color: #1e293b; font-size: 1.75rem; }
+        .subtitle { color: #64748b; margin-top: -0.5rem; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .input-group { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+        input[type="text"] {
+            flex: 1; padding: 0.75rem 1rem; border: 1px solid #cbd5e1;
+            border-radius: 8px; font-size: 1rem; outline: none;
+        }
+        input[type="text"]:focus { border-color: #2563eb; }
+        button {
+            padding: 0.75rem 1.5rem; background-color: #2563eb; color: white;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;
+        }
+        button:hover { background-color: #1d4ed8; }
+        .status-box {
+        padding: 0.85rem 1.1rem; border-radius: 6px; background-color: #f8fafc; border: 1px solid #cbd5e1; margin-bottom: 1.5rem;
+    
+        font-size: 1.1rem; font-weight: 700; line-height: 1.4; color: #0f172a; background: #87d4d6fa;        
+        
+        }
+        .status-box2 {
+        padding: 0.85rem 1.1rem; border-radius: 6px; background-color: #f8fafc; border: 1px solid #cbd5e1; margin-bottom: 1.5rem;
+    
+        font-size: 1.1rem; font-weight: 700; line-height: 1.4; color: #0f172a; background: #7b9de7;        
+        
+        }
+        pre {
+            background-color: #0f172a; color: #38bdf8; padding: 1.25rem;
+            border-radius: 8px; overflow-x: auto; font-family: monospace;
+            font-size: 0.9rem; line-height: 1.5; min-height: 200px; margin: 0;
+        }
+        .info-note {
+            margin-top: 1.5rem; padding: 0.75rem 1rem; background-color: #eff6ff;
+            border-left: 4px solid #3b82f6; color: #1e40af; font-size: 0.85rem;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>🐍 Lol Fiends</h1>
+
+        <div class="input-group">
+            <input type="text" id="api-url" value="" placeholder="Enter Summoner Name with Tag. (Use / in between)">
+            <button id="fetch-btn" py-click="fetch_data">Search User</button>
+        </div>
+
+        <div id="status" class="status-box">Status: Ready</div>
+
+        <div style="font-weight: 600; margin-bottom: 0.5rem;">JSON Response:</div>
+        <pre><code id="output">PUUID is shown here</code></pre>
+
+        <div class="text-list">
+            <p id="text-0" class="status-box"></p>
+            <p id="text-1" class="status-box"></p>
+            <p id="text-2" class="status-box"></p>
+            <p id="text-3" class="status-box"></p>
+            <p id="text-4" class="status-box"></p>
+            <p id="text-5" class="status-box"></p>
+            <p id="text-6" class="status-box"></p>
+        </div>
+
+        <div class="game-list">
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+
+    
+    <script type="py">
+import json, time, asyncio
+from pyodide.http import pyfetch
+from pyscript import document, window
+
+async def fetch_data(event):
+    status_el = document.querySelector("#status")
+    output_el = document.querySelector("#output")
+    url_input = document.querySelector("#api-url")
+
+    for i in range(7):
+        cls = document.querySelector("#text-" + str(i))
+        if i == 0 and cls.innerText != "":
+            window.location.reload()
+
+        cls.innerText = "/"
+    
+    container2 = document.querySelector(".game-list")
+
+    if container2:
+        container2.innerHTML = ""
+    
+    
+
+
+
+    url = url_input.value.strip()
+    if not url:
+        status_el.innerText = "Status: Enter Summoner Name."
+        return
+    url.replace("#", "/")
+    elemen = document.querySelector("#text-0")
+    if elemen:
+        elemen.innerText = "RUNNING"
+    status_el.innerText = "Status: Sending API-Request..."
+    output_el.innerText = "Loading..."
+    API_KEY = ""
+    try:
+        response = await pyfetch("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/"+url+"?api_key="+API_KEY)
+        if response.ok:
+            data = await response.json()
+            formatted_json = json.dumps(data, indent=2, ensure_ascii=False)
+            output_el.innerText = formatted_json
+            status_el.innerText = f"Status: Success (HTTP {response.status})"
+        else:
+            status_el.innerText = f"Status: Error (HTTP {response.status})"
+            err_body = await response.string()
+            output_el.innerText = f"HTTP Fehler {response.status}:\n{err_body}"
+    except Exception as e:
+        status_el.innerText = "Status: Error with the Request"
+        output_el.innerText = f"Error occured: \n{str(e)}\n\n(Check if the Summoner is correct)."
+        data = "Error"
+    
+    print(data)
+    PUUID = data["puuid"]
+    
+    MATCHIDS = []
+    for i in range(15):
+        num = i * 100
+        num2 = str(num)
+        REQUESTS_URL2 = "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/"+PUUID+"/ids?start="+num2+"&count=100&api_key="+API_KEY
+        response = await pyfetch(REQUESTS_URL2)
+        GAMES = await response.json()
+        print("Games found!")
+        MATCHIDS.extend([x for x in GAMES])
+        if [x for x in GAMES] != []:
+            print("XXX")
+    print(MATCHIDS)
+    print(len(MATCHIDS))
+    info2 = []
+    t = 1
+    element = document.querySelector("#text-1")
+    if element:
+        element.innerText = "Games Found: " + str(len(MATCHIDS))
+    if len(MATCHIDS) < 75:
+        var = 30
+    else:
+        var = (round(len(MATCHIDS) / 75)) * 130 + 30
+    element2 = document.querySelector("#text-2")
+    if element2:
+        element2.innerText = "Estimated Time: " + str(var) + " secs"
+
+    for MATCHID in MATCHIDS:
+        time.sleep(0.2)
+        print("Scanning " + MATCHID)
+
+        try:
+            if t % 2 == 0:
+                REQUESTS_URL3 = f"https://europe.api.riotgames.com/lol/match/v5/matches/{MATCHID}?api_key={API_KEY}"
+            else:
+                REQUESTS_URL3 = f"https://europe.api.riotgames.com/lol/match/v5/matches/{MATCHID}?api_key={API_KEY}"
+            response = await pyfetch(REQUESTS_URL3)
+            info = await response.json()
+            info = info["info"]
+            if info["gameMode"] != "CLASSIC":
+                print("Wrong Game Mode")
+                continue
+            players = info["participants"]
+            for player in players:
+                if player["puuid"] == PUUID:
+                    champ = player["championName"]
+                    kills = player["kills"]
+                    deaths = player["deaths"]
+                    assists = player["assists"]
+                    kda = round(player["challenges"]["kda"], 3)
+                    MATCHINFO = [str(champ), str(kills), str(deaths), str(assists), str(kda), str(MATCHID)]
+                    print(MATCHINFO)    
+        except Exception as err:
+            print(err)
+            t = 75
+
+        if type(MATCHINFO) == list:
+            if len(MATCHINFO) == 6:
+                info2.append(MATCHINFO)
+        t+=1
+        if t >= 75:
+            elemenj = document.querySelector("#text-0")
+            if elemenj:
+                elemenj.innerText = "ON PAUSE"
+        if t == 75:
+            
+            for i in range(130):
+                print(f"Waiting... ({i} secs)")
+                await asyncio.sleep(1)
+                
+            t = 1
+            elemen = document.querySelector("#text-0")
+            if elemen:
+                elemen.innerText = "RUNNING"
+                var = var - 130
+                element2 = document.querySelector("#text-2")
+                if element2:
+                    element2.innerText = "Estimated Time: " + str(var) + " secs"
+
+    print(len(info2))
+    print(info2[0])
+
+
+
+
+    print("Here")
+    most = []
+
+    for game in info2:
+        if most == [] or float(game[2]) > float(most[2]):
+            most = game
+    print("Most deaths:")
+    print(most)
+
+    print("Here2")
+    best = []
+
+    for game in info2:
+        if best == [] or float(best[4]) < float(game[4]):
+            best = game
+    print("Best:")
+    print(best)
+
+    print("Here3")
+
+    most_kills = []
+
+    for game in info2:
+        if most_kills == [] or float(game[1]) > float(most_kills[1]):
+            most_kills = game
+    print("Most kills")
+    print(most_kills)
+
+
+
+    print("Here4")
+    worst = []
+    for game in info2:
+        if worst == []:
+            p = int(game[1]) + int(game[3])
+            n = int(game[2])
+            num = n - p
+            worst = game
+            worst.extend(str(num))
+        else:
+            p = int(game[1]) + int(game[3])
+            n = int(game[2])
+            num = n - p
+            if num > int(worst[-1]) and num > 0:
+                worst = game
+                worst.extend(str(num))
+    
+    
+    print("Worst game:")
+    print(worst)
+
+
+    b1 = "Best KDA: " + "Champ: " + best[0] + " K: " + str(best[1]) + " D: " + str(best[2]) + " A: " + str(best[3]) + " KDA: " + str(best[4]) + " Matchid: " + str(best[5])
+    b2 = "Most Kills: " + "Champ: " + most_kills[0] + " K: " + str(most_kills[1]) + " D: " + str(most_kills[2]) + " A " + str(most_kills[3]) + " KDA: " + str(most_kills[4]) + " Matchid: " + str(most_kills[5])
+    b3 = "Most Deaths: " + "Champ: " + most[0] + " K: " + str(most[1]) + " D: " + str(most[2]) + " A: " + str(most[3]) + " KDA: " + str(most[4]) + " Matchid: " + str(most[5])
+    b4 = "Worst KDA: " + "Champ: " + worst[0] + " K: " + str(worst[1]) + " D: " + str(worst[2]) + " A: " + str(worst[3]) + " KDA: " + str(worst[4]) + " Matchid: " + str(worst[5])
+    
+    to_display = [
+    b1,
+    b2, 
+    b3,
+    b4
+    ]
+
+    for index, value in enumerate(to_display):
+        v = 3+index
+        ele = document.querySelector("#text-" + str(v))
+        if ele:
+            ele.innerText = value
+    elemen = document.querySelector("#text-0")
+    if elemen:
+        elemen.innerText = "DONE"
+
+    container = document.querySelector(".game-list")
+    try:
+        for i in range (50):
+            p = document.createElement("p")
+            p.id = "text-" + str(i)
+            p.className = "status-box2"
+            current_game = info2[i][:6]
+            p.innerText = "#" + str(i+1) + " " + " , ".join(current_game)
+            container.appendChild(p)
+    except:
+        print("Less than 50 games")
+    </script>
+
+</body>
+</html>
