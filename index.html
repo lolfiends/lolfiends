@@ -97,6 +97,7 @@
 import json, time, asyncio
 from pyodide.http import pyfetch
 from pyscript import document, window
+from pyodide.ffi import create_proxy
 
 async def fetch_data(event):
     status_el = document.querySelector("#status")
@@ -314,6 +315,7 @@ async def fetch_data(event):
     def show_players(event):
         id = event.target.id
         print(f"Clicked Button ID: {clicked_id}")
+    button_click_proxy = create_proxy(show_players)
 
     for index, value in enumerate(to_display):
         v = 3+index
