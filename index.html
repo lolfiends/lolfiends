@@ -331,6 +331,8 @@ async def fetch_data(event):
         elemen.innerText = "DONE"
 
     container = document.querySelector(".game-list")
+    if container:
+        container.addEventListener("click", show_players)
     try:
         for i in range (50):
             p = document.createElement("p")
@@ -344,7 +346,7 @@ async def fetch_data(event):
             btn.id = "bt" + str(i)
             btn.className = "game-search"
             btn.innerText = "Show"
-            btn.addEventListener("click", show_players)
+            
             p.after(btn)
     except:
         print("Less than 50 games")
