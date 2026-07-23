@@ -99,6 +99,10 @@ from pyodide.http import pyfetch
 from pyscript import document, window, when
 from pyodide.ffi import create_proxy
 
+async def show_players(event):
+    id = event.target.id
+    print(f"Clicked Button ID: {clicked_id}")
+        
 async def fetch_data(event):
     status_el = document.querySelector("#status")
     output_el = document.querySelector("#output")
@@ -311,10 +315,8 @@ async def fetch_data(event):
     b3,
     b4
     ]
-    @when("click", "game-search")
-    def show_players(event):
-        id = event.target.id
-        print(f"Clicked Button ID: {clicked_id}")
+    
+    
     
 
     for index, value in enumerate(to_display):
