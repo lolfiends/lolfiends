@@ -100,8 +100,10 @@ from pyscript import document, window, when
 from pyodide.ffi import create_proxy
 
 async def show_players(event):
-    id = event.target.id
-    print(f"Clicked Button ID: {clicked_id}")
+    print("Hallojnfjdnf")
+    if event.target.tagName == "BUTTON":
+        id = event.target.id
+        print(f"Clicked Button ID: {clicked_id}")
         
 async def fetch_data(event):
     status_el = document.querySelector("#status")
