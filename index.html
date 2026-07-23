@@ -240,6 +240,9 @@ async def fetch_data(event):
 
     print(len(info2))
     print(info2[0])
+    d = {}
+    for j in range(len(info2)):
+        d[j] = info2[j]
 
 
 
@@ -307,6 +310,10 @@ async def fetch_data(event):
     b3,
     b4
     ]
+        
+    def show_players(event):
+        id = event.target.id
+        print(f"Clicked Button ID: {clicked_id}")
 
     for index, value in enumerate(to_display):
         v = 3+index
@@ -326,6 +333,12 @@ async def fetch_data(event):
             current_game = info2[i][:6]
             p.innerText = "#" + str(i+1) + " " + " , ".join(current_game)
             container.appendChild(p)
+
+            btn = document.createElement("button")
+            btn.id = "bt" + str(i)
+            btn.innerText = "Show"
+            btn.addEventListener("click", show_players)
+            p.after(btn)
     except:
         print("Less than 50 games")
     </script>
